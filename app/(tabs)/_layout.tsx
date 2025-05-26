@@ -23,12 +23,11 @@ export default function TabLayout() {
         const routes = state.routes.map((route) => {
           const { options } = descriptors[route.key];
           const label = options.title || route.name;
-
           return {
             ...route,
             title: label,
-            focusedIcon: route.name === "index" ? "home" : "qr-code-scanner",
-            unfocusedIcon: route.name === "index" ? "home" : "qr-code-scanner",
+            focusedIcon: route.name === "index" ? "home" : "receipt",
+            unfocusedIcon: route.name === "index" ? "home" : "receipt",
           };
         });
 

@@ -1,15 +1,45 @@
+import ReceiptConfirmation from "@/components/ReceiptConfirmation";
+import {
+  mockReceiptScan,
+  ReceiptScanResult,
+  scanReceiptWithOpenAI,
+} from "@/services/receiptScanner";
+import { ReceiptItem, useStore } from "@/store/useStore";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { Alert, Linking, StyleSheet, View } from "react-native";
-import { Button, FAB, Surface, Text, useTheme } from "react-native-paper";
+import {
+  Button,
+  Divider,
+  FAB,
+  Modal,
+  Portal,
+  Surface,
+  Text,
+  TextInput,
+  useTheme,
+} from "react-native-paper";
 
 export default function Scan() {
   const theme = useTheme();
+  const { addReceiptItems } = useStore();
   const [permission, requestPermission] = useCameraPermissions();
   const [permissionRequested, setPermissionRequested] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [currentImageUri, setCurrentImageUri] = useState<string>("");
+  const [scanResult, setScanResult] = useState<ReceiptScanResult | null>(null);
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItemIndex, setEditingItemIndex] = useState<number>(-1);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    price: "",
+    quantity: "1",
+  });
 
   const handleRequestPermission = async () => {
     setPermissionRequested(true);
@@ -27,20 +57,23 @@ export default function Scan() {
     }
     setPermissionRequested(false);
   };
-
-  const handleTakePhoto = async () => {
+  const processReceipt = async (imageUri: string) => {
     setIsProcessing(true);
     try {
-      // Here you would capture the photo and process it
-      console.log("Taking receipt photo...");
+      console.log("Processing receipt...", imageUri);
 
-      // Simulate processing time
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      Alert.alert(
-        "Receipt Captured!",
-        "Your receipt has been processed and added to your trip.",
-        [{ text: "OK" }]
-      );
+      // Try OpenAI first, fallback to mock if no API key
+      let result: ReceiptScanResult;
+      try {
+        result = await scanReceiptWithOpenAI(imageUri);
+      } catch (error) {
+        console.log("OpenAI failed, using mock data:", error);
+        result = mockReceiptScan();
+      }
+
+      setCurrentImageUri(imageUri);
+      setScanResult(result);
+      setShowConfirmation(true);
     } catch (err) {
       console.error("Receipt processing error:", err);
       Alert.alert("Error", "Failed to process receipt. Please try again.");
@@ -48,6 +81,30 @@ export default function Scan() {
       setIsProcessing(false);
     }
   };
+  const handleTakePhoto = async () => {
+    if (!permission?.granted) {
+      await handleRequestPermission();
+      return;
+    }
+
+    try {
+      // Launch camera to take a photo
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [3, 4],
+        quality: 0.8, // Good balance between quality and file size
+      });
+
+      if (!result.canceled) {
+        processReceipt(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Camera error:", error);
+      Alert.alert("Camera Error", "Failed to take photo. Please try again.");
+    }
+  };
+
   const handlePickFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -57,25 +114,91 @@ export default function Scan() {
     });
 
     if (!result.canceled) {
-      setIsProcessing(true);
-      try {
-        console.log("Processing receipt from gallery:", result.assets[0].uri);
-
-        // Simulate processing time
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        Alert.alert(
-          "Receipt Processed!",
-          "Your receipt has been processed and added to your trip.",
-          [{ text: "OK" }]
-        );
-      } catch (err) {
-        console.error("Gallery receipt processing error:", err);
-        Alert.alert("Error", "Failed to process receipt. Please try again.");
-      } finally {
-        setIsProcessing(false);
-      }
+      processReceipt(result.assets[0].uri);
     }
   };
+
+  const handleConfirmReceipt = (items: ReceiptItem[]) => {
+    addReceiptItems(items);
+    setShowConfirmation(false);
+    setScanResult(null);
+    setCurrentImageUri("");
+
+    Alert.alert(
+      "Receipt Added!",
+      `${items.length} items have been added to your trip.`,
+      [{ text: "OK" }]
+    );
+  };
+
+  const handleCancelConfirmation = () => {
+    setShowConfirmation(false);
+    setScanResult(null);
+    setCurrentImageUri("");
+  };
+  const handleEditItem = (item: ReceiptItem, index: number) => {
+    setEditingItemIndex(index);
+    setEditForm({
+      name: item.name,
+      price: item.price.toString(),
+      quantity: (item.quantity || 1).toString(),
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!scanResult || editingItemIndex < 0) return;
+
+    const price = parseFloat(editForm.price);
+    const quantity = parseInt(editForm.quantity);
+
+    if (isNaN(price) || price < 0) {
+      Alert.alert("Invalid Price", "Please enter a valid price.");
+      return;
+    }
+
+    if (isNaN(quantity) || quantity < 1) {
+      Alert.alert(
+        "Invalid Quantity",
+        "Please enter a valid quantity (1 or more)."
+      );
+      return;
+    }
+
+    const updatedItems = [...scanResult.items];
+    updatedItems[editingItemIndex] = {
+      ...updatedItems[editingItemIndex],
+      name: editForm.name.trim(),
+      price: price,
+      quantity: quantity,
+    };
+
+    setScanResult({
+      ...scanResult,
+      items: updatedItems,
+    });
+
+    setShowEditModal(false);
+    setEditingItemIndex(-1);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditModal(false);
+    setEditingItemIndex(-1);
+  };
+
+  // Show confirmation screen if we have scan results
+  if (showConfirmation && scanResult && currentImageUri) {
+    return (
+      <ReceiptConfirmation
+        imageUri={currentImageUri}
+        scanResult={scanResult}
+        onConfirm={handleConfirmReceipt}
+        onCancel={handleCancelConfirmation}
+        onEditItem={handleEditItem}
+      />
+    );
+  }
   // Camera Permission Not Granted
   if (!permission?.granted) {
     return (
@@ -168,6 +291,70 @@ export default function Scan() {
           />
         </View>
       </View>
+
+      {/* Edit Item Modal */}
+      <Portal>
+        <Modal
+          visible={showEditModal}
+          onDismiss={handleCancelEdit}
+          contentContainerStyle={[
+            styles.modalContainer,
+            { backgroundColor: theme.colors.surface },
+          ]}
+        >
+          <Text variant="headlineSmall" style={styles.modalTitle}>
+            Edit Item
+          </Text>
+
+          <Divider style={styles.modalDivider} />
+
+          <TextInput
+            label="Item Name"
+            value={editForm.name}
+            onChangeText={(text) => setEditForm({ ...editForm, name: text })}
+            style={styles.modalInput}
+            mode="outlined"
+          />
+
+          <TextInput
+            label="Price"
+            value={editForm.price}
+            onChangeText={(text) => setEditForm({ ...editForm, price: text })}
+            style={styles.modalInput}
+            mode="outlined"
+            keyboardType="decimal-pad"
+            left={<TextInput.Affix text="$" />}
+          />
+
+          <TextInput
+            label="Quantity"
+            value={editForm.quantity}
+            onChangeText={(text) =>
+              setEditForm({ ...editForm, quantity: text })
+            }
+            style={styles.modalInput}
+            mode="outlined"
+            keyboardType="number-pad"
+          />
+
+          <View style={styles.modalActions}>
+            <Button
+              mode="outlined"
+              onPress={handleCancelEdit}
+              style={styles.modalButton}
+            >
+              Cancel
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleSaveEdit}
+              style={styles.modalButton}
+            >
+              Save
+            </Button>
+          </View>
+        </Modal>
+      </Portal>
     </View>
   );
 }
@@ -283,5 +470,31 @@ const styles = StyleSheet.create({
   },
   captureButton: {
     elevation: 4,
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 24,
+    margin: 20,
+    borderRadius: 16,
+    maxHeight: "80%",
+  },
+  modalTitle: {
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  modalDivider: {
+    marginBottom: 20,
+  },
+  modalInput: {
+    marginBottom: 16,
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+    marginTop: 20,
+  },
+  modalButton: {
+    flex: 1,
   },
 });

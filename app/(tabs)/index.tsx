@@ -1,45 +1,262 @@
 import { useStore } from "@/store/useStore";
-import { StyleSheet, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
-import { Button, Text } from "react-native-paper";
+import {
+  Button,
+  Card,
+  DataTable,
+  IconButton,
+  Surface,
+  Text,
+  useTheme,
+} from "react-native-paper";
 import { Easing } from "react-native-reanimated";
 
 export default function Index() {
-  const { runningTotal, setRunningTotal } = useStore();
+  const {
+    runningTotal,
+    receiptItems,
+    removeReceiptItem,
+    clearReceiptItems,
+    addReceiptItems,
+  } = useStore();
+  const theme = useTheme();
+
+  const formatCurrency = (amount: number) => {
+    return `$${amount.toFixed(2)}`;
+  };
+
+  const handleClearAll = () => {
+    clearReceiptItems();
+  };
 
   return (
-    <View
-      style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      showsVerticalScrollIndicator={false}
     >
-      <Text variant="displaySmall">Running Total</Text>
-      <AnimatedRollingNumber
-        value={runningTotal}
-        useGrouping
-        enableCompactNotation
-        compactToFixed={2}
-        textStyle={styles.digits}
-        spinningAnimationConfig={{
-          duration: 800,
-          easing: Easing.elastic(2),
-        }}
-      />
-      <Button onPress={() => setRunningTotal(runningTotal + 120)}>
-        <Text variant="titleLarge">Increment</Text>
-      </Button>
-    </View>
+      {/* Running Total Section */}
+      <Surface
+        style={[styles.totalCard, { backgroundColor: theme.colors.surface }]}
+        elevation={2}
+      >
+        <View style={styles.totalContent}>
+          <Text variant="headlineSmall" style={styles.totalLabel}>
+            Trip Total
+          </Text>
+          <View style={styles.totalAmount}>
+            <Text style={[styles.dollarSign, { color: theme.colors.primary }]}>
+              $
+            </Text>
+            <AnimatedRollingNumber
+              value={runningTotal}
+              useGrouping
+              enableCompactNotation={false}
+              toFixed={2}
+              textStyle={[styles.digits, { color: theme.colors.primary }]}
+              spinningAnimationConfig={{
+                duration: 800,
+                easing: Easing.elastic(2),
+              }}
+            />
+          </View>
+          <Text
+            variant="bodySmall"
+            style={{ color: theme.colors.onSurfaceVariant }}
+          >
+            {receiptItems.length} items
+          </Text>
+        </View>
+      </Surface>
+      {/* Receipt Items Table */}
+      {receiptItems.length > 0 ? (
+        <Surface
+          style={[styles.tableCard, { backgroundColor: theme.colors.surface }]}
+          elevation={1}
+        >
+          <View style={styles.tableHeader}>
+            <Text variant="titleLarge" style={styles.tableTitle}>
+              Receipt Items
+            </Text>
+            <Button
+              mode="outlined"
+              onPress={handleClearAll}
+              style={styles.clearButton}
+              compact
+            >
+              Clear All
+            </Button>
+          </View>
+
+          <DataTable>
+            <DataTable.Header>
+              <DataTable.Title style={styles.nameColumn}>Item</DataTable.Title>
+              <DataTable.Title numeric style={styles.qtyColumn}>
+                Qty
+              </DataTable.Title>
+              <DataTable.Title numeric style={styles.priceColumn}>
+                Price
+              </DataTable.Title>
+              <DataTable.Title style={styles.actionColumn}> </DataTable.Title>
+            </DataTable.Header>
+            {receiptItems.map((item) => (
+              <DataTable.Row key={item.id}>
+                <DataTable.Cell style={styles.nameColumn}>
+                  <Text variant="bodyMedium" numberOfLines={2}>
+                    {item.name}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell numeric style={styles.qtyColumn}>
+                  <Text variant="bodyMedium">{item.quantity || 1}</Text>
+                </DataTable.Cell>
+                <DataTable.Cell numeric style={styles.priceColumn}>
+                  <Text variant="bodyMedium" style={{ fontWeight: "600" }}>
+                    {formatCurrency(item.price * (item.quantity || 1))}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell style={styles.actionColumn}>
+                  <IconButton
+                    icon="delete"
+                    size={20}
+                    onPress={() => removeReceiptItem(item.id)}
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            ))}
+          </DataTable>
+        </Surface>
+      ) : (
+        <Card style={styles.emptyCard}>
+          <Card.Content style={styles.emptyContent}>
+            <MaterialIcons
+              name="receipt-long"
+              size={64}
+              color={theme.colors.onSurfaceVariant}
+              style={styles.emptyIcon}
+            />
+            <Text variant="titleMedium" style={styles.emptyTitle}>
+              No Receipts Yet
+            </Text>
+            <Text
+              variant="bodyMedium"
+              style={{
+                color: theme.colors.onSurfaceVariant,
+                textAlign: "center",
+              }}
+            >
+              Start scanning receipts to track your trip expenses
+            </Text>
+          </Card.Content>
+        </Card>
+      )}
+
+      {/* Test Button (temporary) */}
+      <View style={styles.testSection}>
+        <Button
+          mode="contained"
+          onPress={() => {
+            // Test button to add sample data
+            const testItem = {
+              id: `test_${Date.now()}`,
+              name: `Test Item ${receiptItems.length + 1}`,
+              price: Math.random() * 20 + 5,
+              quantity: 1,
+            };
+            addReceiptItems([testItem]);
+          }}
+          style={styles.testButton}
+        >
+          Add Test Item
+        </Button>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    padding: 16,
+  },
+  totalCard: {
+    marginBottom: 24,
+    borderRadius: 16,
+    padding: 20,
+  },
+  totalContent: {
     alignItems: "center",
   },
-  digits: {
+  totalAmount: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  dollarSign: {
     fontSize: 32,
     fontWeight: "bold",
+    marginRight: 4,
+  },
+  totalLabel: {
+    marginBottom: 8,
+    fontWeight: "600",
+  },
+  digits: {
+    fontSize: 48,
+    fontWeight: "bold",
     paddingHorizontal: 2,
-    color: "#4A90E2",
+    marginBottom: 4,
+  },
+  tableCard: {
+    borderRadius: 16,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  tableHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    paddingBottom: 8,
+  },
+  tableTitle: {
+    fontWeight: "600",
+  },
+  clearButton: {
+    minWidth: 80,
+  },
+  nameColumn: {
+    flex: 3,
+  },
+  qtyColumn: {
+    flex: 1,
+  },
+  priceColumn: {
+    flex: 1.5,
+  },
+  actionColumn: {
+    flex: 0.8,
+    justifyContent: "center",
+  },
+  emptyCard: {
+    marginVertical: 32,
+  },
+  emptyContent: {
+    alignItems: "center",
+    paddingVertical: 32,
+  },
+  emptyIcon: {
+    marginBottom: 16,
+    opacity: 0.7,
+  },
+  emptyTitle: {
+    marginBottom: 8,
+    fontWeight: "600",
+  },
+  testSection: {
+    marginTop: 32,
+    marginBottom: 16,
+  },
+  testButton: {
+    marginVertical: 8,
   },
 });
