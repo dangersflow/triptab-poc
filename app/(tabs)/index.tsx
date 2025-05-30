@@ -54,7 +54,7 @@ export default function Index() {
             >
               <MaterialIcons
                 name="person"
-                size={32}
+                size={64}
                 color={theme.colors.onPrimaryContainer}
               />
             </View>
@@ -214,9 +214,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 128,
+    height: 128,
+    borderRadius: 64,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
