@@ -101,9 +101,11 @@ export default function ReceiptConfirmation({
   };
 
   const calculateTotal = () => {
-    return currentScanResult.items.reduce(
-      (sum, item) => sum + item.price * (item.quantity || 1),
-      0
+    return (
+      currentScanResult.items.reduce(
+        (sum, item) => sum + item.price * (item.quantity || 1),
+        0
+      ) + (currentScanResult.total_tax || 0)
     );
   };
 
@@ -191,6 +193,17 @@ export default function ReceiptConfirmation({
 
           {/* Total */}
           <Divider style={[styles.divider, styles.totalDivider]} />
+          <View style={styles.totalRow}>
+            <Text variant="titleLarge" style={styles.totalLabel}>
+              Total Tax:
+            </Text>
+            <Text
+              variant="titleLarge"
+              style={[styles.totalAmount, { color: theme.colors.primary }]}
+            >
+              {formatCurrency(currentScanResult.total_tax || 0)}
+            </Text>
+          </View>
           <View style={styles.totalRow}>
             <Text variant="titleLarge" style={styles.totalLabel}>
               Total:

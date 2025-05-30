@@ -15,6 +15,7 @@ export interface ReceiptScanResult {
   total?: number;
   merchant?: string;
   date?: string;
+  total_tax?: number;
 }
 
 export async function scanReceiptWithOpenAI(
@@ -57,6 +58,7 @@ export async function scanReceiptWithOpenAI(
                   }
                 ],
                 "total": 0.00,
+                "total_tax": 0.00,
                 "merchant": "store_name",
                 "date": "YYYY-MM-DD"
               }
