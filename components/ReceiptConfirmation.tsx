@@ -1,13 +1,21 @@
 import { ReceiptScanResult } from "@/services/receiptScanner";
 import { ReceiptItem } from "@/store/useStore";
-import React from "react";
-import { Image, ScrollView, StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   Button,
   Card,
   Chip,
   Divider,
   IconButton,
+  Modal,
+  Portal,
   Surface,
   Text,
   useTheme,
@@ -29,6 +37,7 @@ export default function ReceiptConfirmation({
   onEditItem,
 }: ReceiptConfirmationProps) {
   const theme = useTheme();
+  const [showFullscreenImage, setShowFullscreenImage] = useState(false);
 
   const calculateTotal = () => {
     return scanResult.items.reduce(
@@ -49,14 +58,15 @@ export default function ReceiptConfirmation({
         {/* Receipt Image Preview */}
         <Card style={styles.imageCard}>
           <Card.Content>
-            <Image
-              source={{ uri: imageUri }}
-              style={styles.receiptImage}
-              resizeMode="contain"
-            />
+            <TouchableOpacity onPress={() => setShowFullscreenImage(true)}>
+              <Image
+                source={{ uri: imageUri }}
+                style={styles.receiptImage}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
           </Card.Content>
         </Card>
-
         {/* Merchant and Date Info */}
         {(scanResult.merchant || scanResult.date) && (
           <Surface style={styles.infoCard} elevation={1}>
@@ -75,7 +85,6 @@ export default function ReceiptConfirmation({
             )}
           </Surface>
         )}
-
         {/* Items List */}
         <Surface style={styles.itemsCard} elevation={1}>
           <Text variant="titleLarge" style={styles.sectionTitle}>
@@ -133,7 +142,6 @@ export default function ReceiptConfirmation({
             </Text>
           </View>
         </Surface>
-
         {/* Confirmation Message */}
         <Surface style={styles.confirmationCard} elevation={1}>
           <Text
@@ -148,7 +156,6 @@ export default function ReceiptConfirmation({
           </Text>
         </Surface>
       </ScrollView>
-
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <Button
@@ -167,6 +174,33 @@ export default function ReceiptConfirmation({
           Add to Trip
         </Button>
       </View>
+      {/* Fullscreen Image Modal */}
+      <Portal>
+        <Modal
+          visible={showFullscreenImage}
+          onDismiss={() => setShowFullscreenImage(false)}
+          contentContainerStyle={styles.fullscreenModal}
+        >
+          <TouchableOpacity
+            style={styles.fullscreenContainer}
+            onPress={() => setShowFullscreenImage(false)}
+            activeOpacity={1}
+          >
+            <Image
+              source={{ uri: imageUri }}
+              style={styles.fullscreenImage}
+              resizeMode="contain"
+            />
+            <IconButton
+              icon="close"
+              size={30}
+              iconColor="white"
+              style={styles.closeButton}
+              onPress={() => setShowFullscreenImage(false)}
+            />
+          </TouchableOpacity>
+        </Modal>
+      </Portal>
     </View>
   );
 }
@@ -273,5 +307,24 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginLeft: 8,
+  },
+  fullscreenModal: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+  },
+  fullscreenContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fullscreenImage: {
+    width: "100%",
+    height: "100%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });

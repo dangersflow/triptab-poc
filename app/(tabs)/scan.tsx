@@ -89,7 +89,8 @@ export default function Scan() {
     } finally {
       setIsProcessing(false);
     }
-  };  const handleTakePhoto = async () => {
+  };
+  const handleTakePhoto = async () => {
     if (!permission?.granted) {
       await handleRequestPermission();
       return;
@@ -270,7 +271,8 @@ export default function Scan() {
       resizeMode="cover"
     >
       <ThemedAppbar />
-      <View style={[styles.container, { backgroundColor: "transparent" }]}>        <View style={styles.cameraWindow}>
+      <View style={[styles.container, { backgroundColor: "transparent" }]}>
+        <View style={styles.cameraWindow}>
           <CameraView ref={cameraRef} style={styles.cameraView} facing="back" />
           <View style={styles.overlay}>
             <View style={styles.receiptFrame}>
