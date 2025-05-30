@@ -2,6 +2,7 @@ import { ReceiptScanResult } from "@/services/receiptScanner";
 import { ReceiptItem } from "@/store/useStore";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -18,6 +19,7 @@ import {
   Portal,
   Surface,
   Text,
+  TextInput,
   useTheme,
 } from "react-native-paper";
 
@@ -26,7 +28,6 @@ interface ReceiptConfirmationProps {
   scanResult: ReceiptScanResult;
   onConfirm: (items: ReceiptItem[]) => void;
   onCancel: () => void;
-  onEditItem: (item: ReceiptItem, index: number) => void;
 }
 
 export default function ReceiptConfirmation({
@@ -34,13 +35,73 @@ export default function ReceiptConfirmation({
   scanResult,
   onConfirm,
   onCancel,
-  onEditItem,
 }: ReceiptConfirmationProps) {
   const theme = useTheme();
   const [showFullscreenImage, setShowFullscreenImage] = useState(false);
+  const [currentScanResult, setCurrentScanResult] = useState(scanResult);
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItemIndex, setEditingItemIndex] = useState<number>(-1);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    price: "",
+    quantity: "1",
+  });
+
+  const handleEditItem = (item: ReceiptItem, index: number) => {
+    setEditingItemIndex(index);
+    setEditForm({
+      name: item.name,
+      price: item.price.toString(),
+      quantity: (item.quantity || 1).toString(),
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!currentScanResult || editingItemIndex < 0) return;
+
+    const price = parseFloat(editForm.price);
+    const quantity = parseInt(editForm.quantity);
+
+    if (isNaN(price) || price < 0) {
+      Alert.alert("Invalid Price", "Please enter a valid price.");
+      return;
+    }
+
+    if (isNaN(quantity) || quantity < 1) {
+      Alert.alert(
+        "Invalid Quantity",
+        "Please enter a valid quantity (1 or more)."
+      );
+      return;
+    }
+
+    const updatedItems = [...currentScanResult.items];
+    updatedItems[editingItemIndex] = {
+      ...updatedItems[editingItemIndex],
+      name: editForm.name.trim(),
+      price: price,
+      quantity: quantity,
+    };
+
+    setCurrentScanResult({
+      ...currentScanResult,
+      items: updatedItems,
+    });
+
+    setShowEditModal(false);
+    setEditingItemIndex(-1);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditModal(false);
+    setEditingItemIndex(-1);
+  };
 
   const calculateTotal = () => {
-    return scanResult.items.reduce(
+    return currentScanResult.items.reduce(
       (sum, item) => sum + item.price * (item.quantity || 1),
       0
     );
@@ -91,7 +152,7 @@ export default function ReceiptConfirmation({
             Scanned Items
           </Text>
 
-          {scanResult.items.length === 0 ? (
+          {currentScanResult.items.length === 0 ? (
             <Text
               variant="bodyMedium"
               style={{ color: theme.colors.onSurfaceVariant }}
@@ -99,7 +160,7 @@ export default function ReceiptConfirmation({
               No items found. Please try scanning again with better lighting.
             </Text>
           ) : (
-            scanResult.items.map((item, index) => (
+            currentScanResult.items.map((item, index) => (
               <View key={item.id}>
                 <View style={styles.itemRow}>
                   <View style={styles.itemInfo}>
@@ -118,10 +179,10 @@ export default function ReceiptConfirmation({
                   <IconButton
                     icon="pencil"
                     size={20}
-                    onPress={() => onEditItem(item, index)}
+                    onPress={() => handleEditItem(item, index)}
                   />
                 </View>
-                {index < scanResult.items.length - 1 && (
+                {index < currentScanResult.items.length - 1 && (
                   <Divider style={styles.divider} />
                 )}
               </View>
@@ -167,9 +228,9 @@ export default function ReceiptConfirmation({
         </Button>
         <Button
           mode="contained"
-          onPress={() => onConfirm(scanResult.items)}
+          onPress={() => onConfirm(currentScanResult.items)}
           style={[styles.button, styles.confirmButton]}
-          disabled={scanResult.items.length === 0}
+          disabled={currentScanResult.items.length === 0}
         >
           Add to Trip
         </Button>
@@ -199,6 +260,70 @@ export default function ReceiptConfirmation({
               onPress={() => setShowFullscreenImage(false)}
             />
           </TouchableOpacity>
+        </Modal>
+      </Portal>
+
+      {/* Edit Item Modal */}
+      <Portal>
+        <Modal
+          visible={showEditModal}
+          onDismiss={handleCancelEdit}
+          contentContainerStyle={[
+            styles.editModal,
+            { backgroundColor: theme.colors.surface },
+          ]}
+        >
+          <Text variant="headlineSmall" style={styles.editModalTitle}>
+            Edit Item
+          </Text>
+
+          <Divider style={styles.editModalDivider} />
+
+          <TextInput
+            label="Item Name"
+            value={editForm.name}
+            onChangeText={(text) => setEditForm({ ...editForm, name: text })}
+            style={styles.editModalInput}
+            mode="outlined"
+          />
+
+          <TextInput
+            label="Price"
+            value={editForm.price}
+            onChangeText={(text) => setEditForm({ ...editForm, price: text })}
+            style={styles.editModalInput}
+            mode="outlined"
+            keyboardType="decimal-pad"
+            left={<TextInput.Affix text="$" />}
+          />
+
+          <TextInput
+            label="Quantity"
+            value={editForm.quantity}
+            onChangeText={(text) =>
+              setEditForm({ ...editForm, quantity: text })
+            }
+            style={styles.editModalInput}
+            mode="outlined"
+            keyboardType="number-pad"
+          />
+
+          <View style={styles.editModalActions}>
+            <Button
+              mode="outlined"
+              onPress={handleCancelEdit}
+              style={styles.editModalButton}
+            >
+              Cancel
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleSaveEdit}
+              style={styles.editModalButton}
+            >
+              Save
+            </Button>
+          </View>
         </Modal>
       </Portal>
     </View>
@@ -326,5 +451,32 @@ const styles = StyleSheet.create({
     top: 50,
     right: 20,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  editModal: {
+    backgroundColor: "white",
+    padding: 24,
+    margin: 20,
+    borderRadius: 16,
+    maxHeight: "80%",
+  },
+  editModalTitle: {
+    textAlign: "center",
+    marginBottom: 16,
+    fontFamily: "Fredoka_500Medium",
+  },
+  editModalDivider: {
+    marginBottom: 20,
+  },
+  editModalInput: {
+    marginBottom: 16,
+  },
+  editModalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+    marginTop: 20,
+  },
+  editModalButton: {
+    flex: 1,
   },
 });

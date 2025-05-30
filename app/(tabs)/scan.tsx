@@ -18,17 +18,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import {
-  Button,
-  Divider,
-  FAB,
-  Modal,
-  Portal,
-  Surface,
-  Text,
-  TextInput,
-  useTheme,
-} from "react-native-paper";
+import { Button, FAB, Surface, Text, useTheme } from "react-native-paper";
 
 export default function Scan() {
   const theme = useTheme();
@@ -40,15 +30,6 @@ export default function Scan() {
   const [currentImageUri, setCurrentImageUri] = useState<string>("");
   const [scanResult, setScanResult] = useState<ReceiptScanResult | null>(null);
   const cameraRef = useRef<CameraView>(null);
-
-  // Edit modal state
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingItemIndex, setEditingItemIndex] = useState<number>(-1);
-  const [editForm, setEditForm] = useState({
-    name: "",
-    price: "",
-    quantity: "1",
-  });
 
   const handleRequestPermission = async () => {
     setPermissionRequested(true);
@@ -145,61 +126,10 @@ export default function Scan() {
       [{ text: "OK" }]
     );
   };
-
   const handleCancelConfirmation = () => {
     setShowConfirmation(false);
     setScanResult(null);
     setCurrentImageUri("");
-  };
-  const handleEditItem = (item: ReceiptItem, index: number) => {
-    setEditingItemIndex(index);
-    setEditForm({
-      name: item.name,
-      price: item.price.toString(),
-      quantity: (item.quantity || 1).toString(),
-    });
-    setShowEditModal(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (!scanResult || editingItemIndex < 0) return;
-
-    const price = parseFloat(editForm.price);
-    const quantity = parseInt(editForm.quantity);
-
-    if (isNaN(price) || price < 0) {
-      Alert.alert("Invalid Price", "Please enter a valid price.");
-      return;
-    }
-
-    if (isNaN(quantity) || quantity < 1) {
-      Alert.alert(
-        "Invalid Quantity",
-        "Please enter a valid quantity (1 or more)."
-      );
-      return;
-    }
-
-    const updatedItems = [...scanResult.items];
-    updatedItems[editingItemIndex] = {
-      ...updatedItems[editingItemIndex],
-      name: editForm.name.trim(),
-      price: price,
-      quantity: quantity,
-    };
-
-    setScanResult({
-      ...scanResult,
-      items: updatedItems,
-    });
-
-    setShowEditModal(false);
-    setEditingItemIndex(-1);
-  };
-
-  const handleCancelEdit = () => {
-    setShowEditModal(false);
-    setEditingItemIndex(-1);
   };
   // Show confirmation screen if we have scan results
   if (showConfirmation && scanResult && currentImageUri) {
@@ -209,7 +139,6 @@ export default function Scan() {
         scanResult={scanResult}
         onConfirm={handleConfirmReceipt}
         onCancel={handleCancelConfirmation}
-        onEditItem={handleEditItem}
       />
     );
   }
@@ -316,72 +245,8 @@ export default function Scan() {
             loading={isProcessing}
             disabled={isProcessing}
           />
-        </View>
+        </View>{" "}
       </View>
-
-      {/* Edit Item Modal */}
-      <Portal>
-        <Modal
-          visible={showEditModal}
-          onDismiss={handleCancelEdit}
-          contentContainerStyle={[
-            styles.modalContainer,
-            { backgroundColor: theme.colors.surface },
-          ]}
-        >
-          <Text variant="headlineSmall" style={styles.modalTitle}>
-            Edit Item
-          </Text>
-
-          <Divider style={styles.modalDivider} />
-
-          <TextInput
-            label="Item Name"
-            value={editForm.name}
-            onChangeText={(text) => setEditForm({ ...editForm, name: text })}
-            style={styles.modalInput}
-            mode="outlined"
-          />
-
-          <TextInput
-            label="Price"
-            value={editForm.price}
-            onChangeText={(text) => setEditForm({ ...editForm, price: text })}
-            style={styles.modalInput}
-            mode="outlined"
-            keyboardType="decimal-pad"
-            left={<TextInput.Affix text="$" />}
-          />
-
-          <TextInput
-            label="Quantity"
-            value={editForm.quantity}
-            onChangeText={(text) =>
-              setEditForm({ ...editForm, quantity: text })
-            }
-            style={styles.modalInput}
-            mode="outlined"
-            keyboardType="number-pad"
-          />
-
-          <View style={styles.modalActions}>
-            <Button
-              mode="outlined"
-              onPress={handleCancelEdit}
-              style={styles.modalButton}
-            >
-              Cancel
-            </Button>
-            <Button
-              mode="contained"
-              onPress={handleSaveEdit}
-              style={styles.modalButton}
-            >
-              Save
-            </Button>
-          </View>
-        </Modal>
-      </Portal>
 
       {/* Loading Overlay */}
       {isProcessing && (
@@ -549,33 +414,6 @@ const styles = StyleSheet.create({
   },
   captureButton: {
     elevation: 4,
-  },
-  modalContainer: {
-    backgroundColor: "white",
-    padding: 24,
-    margin: 20,
-    borderRadius: 16,
-    maxHeight: "80%",
-  },
-  modalTitle: {
-    textAlign: "center",
-    marginBottom: 16,
-    fontFamily: "Fredoka_500Medium",
-  },
-  modalDivider: {
-    marginBottom: 20,
-  },
-  modalInput: {
-    marginBottom: 16,
-  },
-  modalActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    marginTop: 20,
-  },
-  modalButton: {
-    flex: 1,
   },
   loadingOverlay: {
     position: "absolute",

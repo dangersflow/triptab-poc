@@ -68,6 +68,7 @@ export async function scanReceiptWithOpenAI(
               - Prices should be numbers (not strings)
               - Return only the JSON object, no other text, no indication that it's JSON; just the JSON itself, starting with { and ending with }
               - Please take into account positive and negative prices (e.g., refunds or discounts or exchanges)
+              - Please take sometimes receipts right hand column is the total price including the amount of the items. Look for the price of the INDIVIDUAL items, not the total.
               - If you can't read the receipt clearly, return an empty items array`,
             },
             {
