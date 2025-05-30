@@ -9,7 +9,7 @@ import { ReceiptItem, useStore } from "@/store/useStore";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -39,6 +39,7 @@ export default function Scan() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentImageUri, setCurrentImageUri] = useState<string>("");
   const [scanResult, setScanResult] = useState<ReceiptScanResult | null>(null);
+  const cameraRef = useRef<CameraView>(null);
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
@@ -88,28 +89,33 @@ export default function Scan() {
     } finally {
       setIsProcessing(false);
     }
-  };
-  const handleTakePhoto = async () => {
+  };  const handleTakePhoto = async () => {
     if (!permission?.granted) {
       await handleRequestPermission();
       return;
     }
 
+    if (!cameraRef.current) {
+      Alert.alert("Camera Error", "Camera is not ready. Please try again.");
+      return;
+    }
+
     try {
-      // Launch camera to take a photo
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [3, 4],
-        quality: 0.8, // Good balance between quality and file size
+      setIsProcessing(true);
+      // Take picture directly from CameraView
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.8,
+        base64: false,
+        skipProcessing: false,
       });
 
-      if (!result.canceled) {
-        processReceipt(result.assets[0].uri);
+      if (photo?.uri) {
+        processReceipt(photo.uri);
       }
     } catch (error) {
       console.error("Camera error:", error);
       Alert.alert("Camera Error", "Failed to take photo. Please try again.");
+      setIsProcessing(false);
     }
   };
 
@@ -264,9 +270,8 @@ export default function Scan() {
       resizeMode="cover"
     >
       <ThemedAppbar />
-      <View style={[styles.container, { backgroundColor: "transparent" }]}>
-        <View style={styles.cameraWindow}>
-          <CameraView style={styles.cameraView} facing="back" />
+      <View style={[styles.container, { backgroundColor: "transparent" }]}>        <View style={styles.cameraWindow}>
+          <CameraView ref={cameraRef} style={styles.cameraView} facing="back" />
           <View style={styles.overlay}>
             <View style={styles.receiptFrame}>
               <View style={styles.frameCorner} />

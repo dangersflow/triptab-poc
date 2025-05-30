@@ -66,7 +66,8 @@ export async function scanReceiptWithOpenAI(
               - Generate unique IDs for each item (use item name + index)
               - If quantity is not specified, assume 1
               - Prices should be numbers (not strings)
-              - Return only the JSON object, no other text
+              - Return only the JSON object, no other text, no indication that it's JSON; just the JSON itself, starting with { and ending with }
+              - Please take into account positive and negative prices (e.g., refunds or discounts or exchanges)
               - If you can't read the receipt clearly, return an empty items array`,
             },
             {
@@ -85,6 +86,8 @@ export async function scanReceiptWithOpenAI(
     if (!content) {
       throw new Error("No content received from OpenAI");
     }
+
+    console.log("content", content.trim());
 
     // Parse the JSON response
     const result = JSON.parse(content.trim());
