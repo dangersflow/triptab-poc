@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
   merchantText: {
     fontWeight: "600",
     marginBottom: 4,
+    fontFamily: "Fredoka_500Medium",
   },
   itemsCard: {
     padding: 16,
@@ -205,6 +206,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontWeight: "600",
     marginBottom: 16,
+    fontFamily: "Fredoka_500Medium",
   },
   itemRow: {
     flexDirection: "row",
@@ -217,6 +219,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontWeight: "500",
     marginBottom: 4,
+    fontFamily: "Lato_400Regular",
   },
   itemDetails: {
     flexDirection: "row",
@@ -228,6 +231,7 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     fontWeight: "600",
+    fontFamily: "Fredoka_500Medium",
   },
   divider: {
     marginVertical: 4,
@@ -244,10 +248,12 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontWeight: "600",
+    fontFamily: "Fredoka_600SemiBold",
   },
   totalAmount: {
     fontWeight: "bold",
     fontSize: 20,
+    fontFamily: "Fredoka_700Bold",
   },
   confirmationCard: {
     padding: 16,

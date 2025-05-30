@@ -421,11 +421,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 12,
     fontWeight: "600",
+    fontFamily: "Fredoka_500Medium",
   },
   description: {
     textAlign: "center",
     marginBottom: 24,
     lineHeight: 22,
+    fontFamily: "Lato_400Regular",
   },
   button: {
     width: "100%",
@@ -496,10 +498,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 8,
     fontWeight: "600",
+    fontFamily: "Fredoka_500Medium",
   },
   subInstructionText: {
     color: "rgba(255,255,255,0.8)",
     textAlign: "center",
+    fontFamily: "Lato_400Regular",
   },
   actionButtons: {
     flexDirection: "row",
@@ -522,6 +526,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     textAlign: "center",
     marginBottom: 16,
+    fontFamily: "Fredoka_500Medium",
   },
   modalDivider: {
     marginBottom: 20,
@@ -563,9 +568,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 8,
     fontWeight: "600",
+    fontFamily: "Fredoka_500Medium",
   },
   loadingSubtext: {
     textAlign: "center",
     opacity: 0.7,
+    fontFamily: "Lato_400Regular",
   },
 });

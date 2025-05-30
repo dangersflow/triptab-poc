@@ -229,16 +229,19 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     marginRight: 4,
+    fontFamily: "Fredoka_700Bold",
   },
   totalLabel: {
     marginBottom: 8,
     fontWeight: "600",
+    fontFamily: "Fredoka_500Medium",
   },
   digits: {
     fontSize: 48,
     fontWeight: "bold",
     paddingHorizontal: 2,
     marginBottom: 4,
+    fontFamily: "Fredoka_700Bold",
   },
   tableCard: {
     borderRadius: 16,
@@ -254,6 +257,7 @@ const styles = StyleSheet.create({
   },
   tableTitle: {
     fontWeight: "600",
+    fontFamily: "Fredoka_500Medium",
   },
   clearButton: {
     minWidth: 80,
@@ -285,6 +289,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     marginBottom: 8,
     fontWeight: "600",
+    fontFamily: "Fredoka_500Medium",
   },
   testSection: {
     marginTop: 32,

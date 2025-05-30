@@ -41,6 +41,100 @@ export default {
     onSurfaceDisabled: "rgba(26, 28, 24, 0.38)",
     backdrop: "rgba(44, 50, 41, 0.4)",
   },
+  fonts: {
+    // Header fonts use Fredoka
+    displayLarge: {
+      fontFamily: "Fredoka_600SemiBold",
+      fontSize: 57,
+      fontWeight: "600" as const,
+      lineHeight: 64,
+    },
+    displayMedium: {
+      fontFamily: "Fredoka_600SemiBold",
+      fontSize: 45,
+      fontWeight: "600" as const,
+      lineHeight: 52,
+    },
+    displaySmall: {
+      fontFamily: "Fredoka_600SemiBold",
+      fontSize: 36,
+      fontWeight: "600" as const,
+      lineHeight: 44,
+    },
+    headlineLarge: {
+      fontFamily: "Fredoka_600SemiBold",
+      fontSize: 32,
+      fontWeight: "600" as const,
+      lineHeight: 40,
+    },
+    headlineMedium: {
+      fontFamily: "Fredoka_500Medium",
+      fontSize: 28,
+      fontWeight: "500" as const,
+      lineHeight: 36,
+    },
+    headlineSmall: {
+      fontFamily: "Fredoka_500Medium",
+      fontSize: 24,
+      fontWeight: "500" as const,
+      lineHeight: 32,
+    },
+    titleLarge: {
+      fontFamily: "Fredoka_500Medium",
+      fontSize: 22,
+      fontWeight: "500" as const,
+      lineHeight: 28,
+    },
+    titleMedium: {
+      fontFamily: "Fredoka_500Medium",
+      fontSize: 16,
+      fontWeight: "500" as const,
+      lineHeight: 24,
+    },
+    titleSmall: {
+      fontFamily: "Fredoka_500Medium",
+      fontSize: 14,
+      fontWeight: "500" as const,
+      lineHeight: 20,
+    },
+    // Body fonts use Lato
+    bodyLarge: {
+      fontFamily: "Lato_400Regular",
+      fontSize: 16,
+      fontWeight: "400" as const,
+      lineHeight: 24,
+    },
+    bodyMedium: {
+      fontFamily: "Lato_400Regular",
+      fontSize: 14,
+      fontWeight: "400" as const,
+      lineHeight: 20,
+    },
+    bodySmall: {
+      fontFamily: "Lato_400Regular",
+      fontSize: 12,
+      fontWeight: "400" as const,
+      lineHeight: 16,
+    },
+    labelLarge: {
+      fontFamily: "Lato_700Bold",
+      fontSize: 14,
+      fontWeight: "700" as const,
+      lineHeight: 20,
+    },
+    labelMedium: {
+      fontFamily: "Lato_700Bold",
+      fontSize: 12,
+      fontWeight: "700" as const,
+      lineHeight: 16,
+    },
+    labelSmall: {
+      fontFamily: "Lato_700Bold",
+      fontSize: 11,
+      fontWeight: "700" as const,
+      lineHeight: 16,
+    },
+  },
 };
 
 export type Theme = typeof import("./light").default;
