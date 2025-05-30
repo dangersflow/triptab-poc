@@ -59,7 +59,7 @@ export default function Index() {
               />
             </View>
             <Text variant="headlineSmall" style={styles.totalLabel}>
-              Trip Total
+              Our Super Amazing Trip!!!
             </Text>
             <View style={styles.totalAmount}>
               <Text
@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     marginBottom: 8,
-    fontWeight: "600",
-    fontFamily: "Fredoka_500Medium",
+    fontSize: 28,
+    fontFamily: "Fredoka_700Bold",
   },
   digits: {
     fontSize: 48,

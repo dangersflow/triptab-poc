@@ -10,7 +10,7 @@ export function ThemedAppbar() {
       }}
     >
       <Appbar.BackAction onPress={() => {}} />
-      <Appbar.Content title="Title" />
+      <Appbar.Content title="TripTab" />
       <Appbar.Action icon="calendar" onPress={() => {}} />
       <Appbar.Action icon="magnify" onPress={() => {}} />
     </Appbar.Header>
