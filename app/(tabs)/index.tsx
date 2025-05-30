@@ -1,3 +1,4 @@
+import { ThemedAppbar } from "@/components/ui/ThemedAppbar";
 import { useStore } from "@/store/useStore";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ImageBackground, ScrollView, StyleSheet, View } from "react-native";
@@ -36,6 +37,7 @@ export default function Index() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
+      <ThemedAppbar />
       <ScrollView
         style={[styles.container, { backgroundColor: "transparent" }]}
         showsVerticalScrollIndicator={false}

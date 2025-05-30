@@ -1,4 +1,5 @@
 import ReceiptConfirmation from "@/components/ReceiptConfirmation";
+import { ThemedAppbar } from "@/components/ui/ThemedAppbar";
 import {
   mockReceiptScan,
   ReceiptScanResult,
@@ -214,6 +215,7 @@ export default function Scan() {
         style={styles.backgroundImage}
         resizeMode="cover"
       >
+        <ThemedAppbar />
         <View style={[styles.container, { backgroundColor: "transparent" }]}>
           <Surface
             style={[
@@ -254,7 +256,6 @@ export default function Scan() {
       </ImageBackground>
     );
   }
-
   // Camera Ready - Show Camera View
   return (
     <ImageBackground
@@ -262,6 +263,7 @@ export default function Scan() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
+      <ThemedAppbar />
       <View style={styles.cameraContainer}>
         <CameraView style={StyleSheet.absoluteFill} facing="back" />
         <View style={styles.overlay}>

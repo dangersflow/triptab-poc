@@ -10,8 +10,6 @@ import {
   PaperProvider,
 } from "react-native-paper";
 
-import { ThemedAppbar } from "@/components/ui/ThemedAppbar";
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -53,7 +51,6 @@ export default function RootLayout() {
 
   return (
     <PaperProvider theme={colorScheme === "dark" ? darkTheme : lightTheme}>
-      <ThemedAppbar />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
