@@ -40,11 +40,8 @@ export default function ReceiptConfirmation({
   const formatCurrency = (amount: number) => {
     return `$${amount.toFixed(2)}`;
   };
-
   return (
-    <View
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}

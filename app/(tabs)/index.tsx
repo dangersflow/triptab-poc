@@ -1,6 +1,6 @@
 import { useStore } from "@/store/useStore";
 import { MaterialIcons } from "@expo/vector-icons";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ImageBackground, ScrollView, StyleSheet, View } from "react-native";
 import { AnimatedRollingNumber } from "react-native-animated-rolling-numbers";
 import {
   Button,
@@ -30,151 +30,177 @@ export default function Index() {
   const handleClearAll = () => {
     clearReceiptItems();
   };
-
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      showsVerticalScrollIndicator={false}
+    <ImageBackground
+      source={require("@/assets/images/background.png")}
+      style={styles.backgroundImage}
+      resizeMode="cover"
     >
-      {/* Running Total Section */}
-      <Surface
-        style={[styles.totalCard, { backgroundColor: theme.colors.surface }]}
-        elevation={2}
+      <ScrollView
+        style={[styles.container, { backgroundColor: "transparent" }]}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.totalContent}>
-          <Text variant="headlineSmall" style={styles.totalLabel}>
-            Trip Total
-          </Text>
-          <View style={styles.totalAmount}>
-            <Text style={[styles.dollarSign, { color: theme.colors.primary }]}>
-              $
-            </Text>
-            <AnimatedRollingNumber
-              value={runningTotal}
-              useGrouping
-              enableCompactNotation={false}
-              toFixed={2}
-              textStyle={[styles.digits, { color: theme.colors.primary }]}
-              spinningAnimationConfig={{
-                duration: 800,
-                easing: Easing.elastic(2),
-              }}
-            />
-          </View>
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
-            {receiptItems.length} items
-          </Text>
-        </View>
-      </Surface>
-      {/* Receipt Items Table */}
-      {receiptItems.length > 0 ? (
+        {/* Running Total Section */}
         <Surface
-          style={[styles.tableCard, { backgroundColor: theme.colors.surface }]}
-          elevation={1}
+          style={[styles.totalCard, { backgroundColor: theme.colors.surface }]}
+          elevation={2}
         >
-          <View style={styles.tableHeader}>
-            <Text variant="titleLarge" style={styles.tableTitle}>
-              Receipt Items
-            </Text>
-            <Button
-              mode="outlined"
-              onPress={handleClearAll}
-              style={styles.clearButton}
-              compact
+          <View style={styles.totalContent}>
+            <View
+              style={[
+                styles.avatar,
+                { backgroundColor: theme.colors.primaryContainer },
+              ]}
             >
-              Clear All
-            </Button>
-          </View>
-
-          <DataTable>
-            <DataTable.Header>
-              <DataTable.Title style={styles.nameColumn}>Item</DataTable.Title>
-              <DataTable.Title numeric style={styles.qtyColumn}>
-                Qty
-              </DataTable.Title>
-              <DataTable.Title numeric style={styles.priceColumn}>
-                Price
-              </DataTable.Title>
-              <DataTable.Title style={styles.actionColumn}> </DataTable.Title>
-            </DataTable.Header>
-            {receiptItems.map((item) => (
-              <DataTable.Row key={item.id}>
-                <DataTable.Cell style={styles.nameColumn}>
-                  <Text variant="bodyMedium" numberOfLines={2}>
-                    {item.name}
-                  </Text>
-                </DataTable.Cell>
-                <DataTable.Cell numeric style={styles.qtyColumn}>
-                  <Text variant="bodyMedium">{item.quantity || 1}</Text>
-                </DataTable.Cell>
-                <DataTable.Cell numeric style={styles.priceColumn}>
-                  <Text variant="bodyMedium" style={{ fontWeight: "600" }}>
-                    {formatCurrency(item.price * (item.quantity || 1))}
-                  </Text>
-                </DataTable.Cell>
-                <DataTable.Cell style={styles.actionColumn}>
-                  <IconButton
-                    icon="delete"
-                    size={20}
-                    onPress={() => removeReceiptItem(item.id)}
-                  />
-                </DataTable.Cell>
-              </DataTable.Row>
-            ))}
-          </DataTable>
-        </Surface>
-      ) : (
-        <Card style={styles.emptyCard}>
-          <Card.Content style={styles.emptyContent}>
-            <MaterialIcons
-              name="receipt-long"
-              size={64}
-              color={theme.colors.onSurfaceVariant}
-              style={styles.emptyIcon}
-            />
-            <Text variant="titleMedium" style={styles.emptyTitle}>
-              No Receipts Yet
+              <MaterialIcons
+                name="person"
+                size={32}
+                color={theme.colors.onPrimaryContainer}
+              />
+            </View>
+            <Text variant="headlineSmall" style={styles.totalLabel}>
+              Trip Total
             </Text>
+            <View style={styles.totalAmount}>
+              <Text
+                style={[styles.dollarSign, { color: theme.colors.primary }]}
+              >
+                $
+              </Text>
+              <AnimatedRollingNumber
+                value={runningTotal}
+                useGrouping
+                enableCompactNotation={false}
+                toFixed={2}
+                textStyle={[styles.digits, { color: theme.colors.primary }]}
+                spinningAnimationConfig={{
+                  duration: 800,
+                  easing: Easing.elastic(2),
+                }}
+              />
+            </View>
             <Text
-              variant="bodyMedium"
-              style={{
-                color: theme.colors.onSurfaceVariant,
-                textAlign: "center",
-              }}
+              variant="bodySmall"
+              style={{ color: theme.colors.onSurfaceVariant }}
             >
-              Start scanning receipts to track your trip expenses
+              {receiptItems.length} items
             </Text>
-          </Card.Content>
-        </Card>
-      )}
+          </View>
+        </Surface>
+        {/* Receipt Items Table */}
+        {receiptItems.length > 0 ? (
+          <Surface
+            style={[
+              styles.tableCard,
+              { backgroundColor: theme.colors.surface },
+            ]}
+            elevation={1}
+          >
+            <View style={styles.tableHeader}>
+              <Text variant="titleLarge" style={styles.tableTitle}>
+                Receipt Items
+              </Text>
+              <Button
+                mode="outlined"
+                onPress={handleClearAll}
+                style={styles.clearButton}
+                compact
+              >
+                Clear All
+              </Button>
+            </View>
 
-      {/* Test Button (temporary) */}
-      <View style={styles.testSection}>
-        <Button
-          mode="contained"
-          onPress={() => {
-            // Test button to add sample data
-            const testItem = {
-              id: `test_${Date.now()}`,
-              name: `Test Item ${receiptItems.length + 1}`,
-              price: Math.random() * 20 + 5,
-              quantity: 1,
-            };
-            addReceiptItems([testItem]);
-          }}
-          style={styles.testButton}
-        >
-          Add Test Item
-        </Button>
-      </View>
-    </ScrollView>
+            <DataTable>
+              <DataTable.Header>
+                <DataTable.Title style={styles.nameColumn}>
+                  Item
+                </DataTable.Title>
+                <DataTable.Title numeric style={styles.qtyColumn}>
+                  Qty
+                </DataTable.Title>
+                <DataTable.Title numeric style={styles.priceColumn}>
+                  Price
+                </DataTable.Title>
+                <DataTable.Title style={styles.actionColumn}> </DataTable.Title>
+              </DataTable.Header>
+              {receiptItems.map((item) => (
+                <DataTable.Row key={item.id}>
+                  <DataTable.Cell style={styles.nameColumn}>
+                    <Text variant="bodyMedium" numberOfLines={2}>
+                      {item.name}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell numeric style={styles.qtyColumn}>
+                    <Text variant="bodyMedium">{item.quantity || 1}</Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell numeric style={styles.priceColumn}>
+                    <Text variant="bodyMedium" style={{ fontWeight: "600" }}>
+                      {formatCurrency(item.price * (item.quantity || 1))}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.actionColumn}>
+                    <IconButton
+                      icon="delete"
+                      size={20}
+                      onPress={() => removeReceiptItem(item.id)}
+                    />
+                  </DataTable.Cell>
+                </DataTable.Row>
+              ))}
+            </DataTable>
+          </Surface>
+        ) : (
+          <Card style={styles.emptyCard}>
+            <Card.Content style={styles.emptyContent}>
+              <MaterialIcons
+                name="receipt-long"
+                size={64}
+                color={theme.colors.onSurfaceVariant}
+                style={styles.emptyIcon}
+              />
+              <Text variant="titleMedium" style={styles.emptyTitle}>
+                No Receipts Yet
+              </Text>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  color: theme.colors.onSurfaceVariant,
+                  textAlign: "center",
+                }}
+              >
+                Start scanning receipts to track your trip expenses
+              </Text>
+            </Card.Content>
+          </Card>
+        )}
+        {/* Test Button (temporary) */}
+        <View style={styles.testSection}>
+          <Button
+            mode="contained"
+            onPress={() => {
+              // Test button to add sample data
+              const testItem = {
+                id: `test_${Date.now()}`,
+                name: `Test Item ${receiptItems.length + 1}`,
+                price: Math.random() * 20 + 5,
+                quantity: 1,
+              };
+              addReceiptItems([testItem]);
+            }}
+            style={styles.testButton}
+          >
+            Add Test Item
+          </Button>
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -186,6 +212,14 @@ const styles = StyleSheet.create({
   },
   totalContent: {
     alignItems: "center",
+  },
+  avatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
   },
   totalAmount: {
     flexDirection: "row",

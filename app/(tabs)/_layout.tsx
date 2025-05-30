@@ -2,6 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { CommonActions } from "@react-navigation/native";
 import { Tabs } from "expo-router";
 import React from "react";
+import { StyleSheet } from "react-native";
 import { BottomNavigation, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -12,7 +13,6 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-
   return (
     <Tabs
       screenOptions={{
@@ -84,3 +84,9 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+  },
+});

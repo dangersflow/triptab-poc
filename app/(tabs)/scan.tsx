@@ -9,7 +9,14 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
-import { Alert, Linking, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  ImageBackground,
+  Linking,
+  StyleSheet,
+  View,
+} from "react-native";
 import {
   Button,
   Divider,
@@ -186,7 +193,6 @@ export default function Scan() {
     setShowEditModal(false);
     setEditingItemIndex(-1);
   };
-
   // Show confirmation screen if we have scan results
   if (showConfirmation && scanResult && currentImageUri) {
     return (
@@ -199,167 +205,202 @@ export default function Scan() {
       />
     );
   }
+
   // Camera Permission Not Granted
   if (!permission?.granted) {
     return (
-      <View
-        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      <ImageBackground
+        source={require("@/assets/images/background.png")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       >
-        <Surface
-          style={[
-            styles.permissionCard,
-            { backgroundColor: theme.colors.surface },
-          ]}
-          elevation={2}
-        >
-          <MaterialIcons
-            name="receipt"
-            size={64}
-            color={theme.colors.primary}
-            style={styles.icon}
-          />
-          <Text variant="headlineSmall" style={styles.title}>
-            Camera Permission Required
-          </Text>
-          <Text
-            variant="bodyLarge"
-            style={[styles.description, { color: theme.colors.onSurface }]}
-          >
-            TripTab needs access to your camera to scan receipts and add them to
-            your trips.
-          </Text>
-          <Button
-            mode="contained"
-            onPress={handleRequestPermission}
-            style={styles.button}
-            disabled={permissionRequested}
-            loading={permissionRequested}
-          >
-            {permissionRequested
-              ? "Requesting Permission..."
-              : "Grant Camera Permission"}
-          </Button>
-        </Surface>
-      </View>
-    );
-  } // Camera Ready - Show Camera View
-  return (
-    <View style={styles.cameraContainer}>
-      <CameraView style={StyleSheet.absoluteFill} facing="back" />
-      <View style={styles.overlay}>
-        <View style={styles.receiptFrame}>
-          <View style={styles.frameCorner} />
-          <View style={[styles.frameCorner, styles.topRight]} />
-          <View style={[styles.frameCorner, styles.bottomLeft]} />
-          <View style={[styles.frameCorner, styles.bottomRight]} />
-
-          <Text variant="bodySmall" style={styles.frameLabel}>
-            Receipt Frame
-          </Text>
-        </View>
-
-        <View style={styles.instructionContainer}>
-          <Text variant="titleMedium" style={styles.instructionText}>
-            Position your receipt within the frame
-          </Text>
-          <Text variant="bodyMedium" style={styles.subInstructionText}>
-            Make sure the text is clear and well-lit
-          </Text>
-        </View>
-
-        <View style={styles.actionButtons}>
-          <FAB
-            icon="image"
+        <View style={[styles.container, { backgroundColor: "transparent" }]}>
+          <Surface
             style={[
-              styles.galleryButton,
+              styles.permissionCard,
               { backgroundColor: theme.colors.surface },
             ]}
-            onPress={handlePickFromGallery}
-            disabled={isProcessing}
-          />
-
-          <FAB
-            icon="camera"
-            size="large"
-            style={[
-              styles.captureButton,
-              { backgroundColor: theme.colors.primary },
-            ]}
-            onPress={handleTakePhoto}
-            loading={isProcessing}
-            disabled={isProcessing}
-          />
-        </View>
-      </View>
-
-      {/* Edit Item Modal */}
-      <Portal>
-        <Modal
-          visible={showEditModal}
-          onDismiss={handleCancelEdit}
-          contentContainerStyle={[
-            styles.modalContainer,
-            { backgroundColor: theme.colors.surface },
-          ]}
-        >
-          <Text variant="headlineSmall" style={styles.modalTitle}>
-            Edit Item
-          </Text>
-
-          <Divider style={styles.modalDivider} />
-
-          <TextInput
-            label="Item Name"
-            value={editForm.name}
-            onChangeText={(text) => setEditForm({ ...editForm, name: text })}
-            style={styles.modalInput}
-            mode="outlined"
-          />
-
-          <TextInput
-            label="Price"
-            value={editForm.price}
-            onChangeText={(text) => setEditForm({ ...editForm, price: text })}
-            style={styles.modalInput}
-            mode="outlined"
-            keyboardType="decimal-pad"
-            left={<TextInput.Affix text="$" />}
-          />
-
-          <TextInput
-            label="Quantity"
-            value={editForm.quantity}
-            onChangeText={(text) =>
-              setEditForm({ ...editForm, quantity: text })
-            }
-            style={styles.modalInput}
-            mode="outlined"
-            keyboardType="number-pad"
-          />
-
-          <View style={styles.modalActions}>
-            <Button
-              mode="outlined"
-              onPress={handleCancelEdit}
-              style={styles.modalButton}
+            elevation={2}
+          >
+            <MaterialIcons
+              name="receipt"
+              size={64}
+              color={theme.colors.primary}
+              style={styles.icon}
+            />
+            <Text variant="headlineSmall" style={styles.title}>
+              Camera Permission Required
+            </Text>
+            <Text
+              variant="bodyLarge"
+              style={[styles.description, { color: theme.colors.onSurface }]}
             >
-              Cancel
-            </Button>
+              TripTab needs access to your camera to scan receipts and add them
+              to your trips.
+            </Text>
             <Button
               mode="contained"
-              onPress={handleSaveEdit}
-              style={styles.modalButton}
+              onPress={handleRequestPermission}
+              style={styles.button}
+              disabled={permissionRequested}
+              loading={permissionRequested}
             >
-              Save
+              {permissionRequested
+                ? "Requesting Permission..."
+                : "Grant Camera Permission"}
             </Button>
+          </Surface>
+        </View>
+      </ImageBackground>
+    );
+  }
+
+  // Camera Ready - Show Camera View
+  return (
+    <ImageBackground
+      source={require("@/assets/images/background.png")}
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <View style={styles.cameraContainer}>
+        <CameraView style={StyleSheet.absoluteFill} facing="back" />
+        <View style={styles.overlay}>
+          <View style={styles.receiptFrame}>
+            <View style={styles.frameCorner} />
+            <View style={[styles.frameCorner, styles.topRight]} />
+            <View style={[styles.frameCorner, styles.bottomLeft]} />
+            <View style={[styles.frameCorner, styles.bottomRight]} />
+
+            <Text variant="bodySmall" style={styles.frameLabel}>
+              Receipt Frame
+            </Text>
           </View>
-        </Modal>
-      </Portal>
-    </View>
+
+          <View style={styles.instructionContainer}>
+            <Text variant="titleMedium" style={styles.instructionText}>
+              Position your receipt within the frame
+            </Text>
+            <Text variant="bodyMedium" style={styles.subInstructionText}>
+              Make sure the text is clear and well-lit
+            </Text>
+          </View>
+
+          <View style={styles.actionButtons}>
+            <FAB
+              icon="image"
+              style={[
+                styles.galleryButton,
+                { backgroundColor: theme.colors.surface },
+              ]}
+              onPress={handlePickFromGallery}
+              disabled={isProcessing}
+            />
+
+            <FAB
+              icon="camera"
+              size="large"
+              style={[
+                styles.captureButton,
+                { backgroundColor: theme.colors.primary },
+              ]}
+              onPress={handleTakePhoto}
+              loading={isProcessing}
+              disabled={isProcessing}
+            />
+          </View>
+        </View>
+
+        {/* Edit Item Modal */}
+        <Portal>
+          <Modal
+            visible={showEditModal}
+            onDismiss={handleCancelEdit}
+            contentContainerStyle={[
+              styles.modalContainer,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            <Text variant="headlineSmall" style={styles.modalTitle}>
+              Edit Item
+            </Text>
+
+            <Divider style={styles.modalDivider} />
+
+            <TextInput
+              label="Item Name"
+              value={editForm.name}
+              onChangeText={(text) => setEditForm({ ...editForm, name: text })}
+              style={styles.modalInput}
+              mode="outlined"
+            />
+
+            <TextInput
+              label="Price"
+              value={editForm.price}
+              onChangeText={(text) => setEditForm({ ...editForm, price: text })}
+              style={styles.modalInput}
+              mode="outlined"
+              keyboardType="decimal-pad"
+              left={<TextInput.Affix text="$" />}
+            />
+
+            <TextInput
+              label="Quantity"
+              value={editForm.quantity}
+              onChangeText={(text) =>
+                setEditForm({ ...editForm, quantity: text })
+              }
+              style={styles.modalInput}
+              mode="outlined"
+              keyboardType="number-pad"
+            />
+
+            <View style={styles.modalActions}>
+              <Button
+                mode="outlined"
+                onPress={handleCancelEdit}
+                style={styles.modalButton}
+              >
+                Cancel
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleSaveEdit}
+                style={styles.modalButton}
+              >
+                Save
+              </Button>
+            </View>
+          </Modal>
+        </Portal>
+
+        {/* Loading Overlay */}
+        {isProcessing && (
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator
+                size="large"
+                color={theme.colors.primary}
+                style={styles.loadingSpinner}
+              />
+              <Text variant="titleMedium" style={styles.loadingText}>
+                Processing Receipt...
+              </Text>
+              <Text variant="bodyMedium" style={styles.loadingSubtext}>
+                Extracting items and prices
+              </Text>
+            </View>
+          </View>
+        )}
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -496,5 +537,35 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 1,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  loadingContainer: {
+    backgroundColor: "rgba(255,255,255,0.95)",
+    padding: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    minWidth: 200,
+  },
+  loadingSpinner: {
+    marginBottom: 16,
+  },
+  loadingText: {
+    textAlign: "center",
+    marginBottom: 8,
+    fontWeight: "600",
+  },
+  loadingSubtext: {
+    textAlign: "center",
+    opacity: 0.7,
   },
 });
