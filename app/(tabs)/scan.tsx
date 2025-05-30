@@ -264,137 +264,136 @@ export default function Scan() {
       resizeMode="cover"
     >
       <ThemedAppbar />
-      <View style={styles.cameraContainer}>
-        <CameraView style={StyleSheet.absoluteFill} facing="back" />
-        <View style={styles.overlay}>
-          <View style={styles.receiptFrame}>
-            <View style={styles.frameCorner} />
-            <View style={[styles.frameCorner, styles.topRight]} />
-            <View style={[styles.frameCorner, styles.bottomLeft]} />
-            <View style={[styles.frameCorner, styles.bottomRight]} />
+      <View style={[styles.container, { backgroundColor: "transparent" }]}>
+        <View style={styles.cameraWindow}>
+          <CameraView style={styles.cameraView} facing="back" />
+          <View style={styles.overlay}>
+            <View style={styles.receiptFrame}>
+              <View style={styles.frameCorner} />
+              <View style={[styles.frameCorner, styles.topRight]} />
+              <View style={[styles.frameCorner, styles.bottomLeft]} />
+              <View style={[styles.frameCorner, styles.bottomRight]} />
 
-            <Text variant="bodySmall" style={styles.frameLabel}>
-              Receipt Frame
-            </Text>
-          </View>
-
-          <View style={styles.instructionContainer}>
-            <Text variant="titleMedium" style={styles.instructionText}>
-              Position your receipt within the frame
-            </Text>
-            <Text variant="bodyMedium" style={styles.subInstructionText}>
-              Make sure the text is clear and well-lit
-            </Text>
-          </View>
-
-          <View style={styles.actionButtons}>
-            <FAB
-              icon="image"
-              style={[
-                styles.galleryButton,
-                { backgroundColor: theme.colors.surface },
-              ]}
-              onPress={handlePickFromGallery}
-              disabled={isProcessing}
-            />
-
-            <FAB
-              icon="camera"
-              size="large"
-              style={[
-                styles.captureButton,
-                { backgroundColor: theme.colors.primary },
-              ]}
-              onPress={handleTakePhoto}
-              loading={isProcessing}
-              disabled={isProcessing}
-            />
+              <Text variant="bodySmall" style={styles.frameLabel}>
+                Receipt Frame
+              </Text>
+            </View>
           </View>
         </View>
-
-        {/* Edit Item Modal */}
-        <Portal>
-          <Modal
-            visible={showEditModal}
-            onDismiss={handleCancelEdit}
-            contentContainerStyle={[
-              styles.modalContainer,
+        <View style={styles.instructionContainer}>
+          <Text variant="titleMedium" style={styles.instructionText}>
+            Position your receipt within the frame
+          </Text>
+          <Text variant="bodyMedium" style={styles.subInstructionText}>
+            Make sure the text is clear and well-lit
+          </Text>
+        </View>
+        <View style={styles.actionButtons}>
+          <FAB
+            icon="image"
+            style={[
+              styles.galleryButton,
               { backgroundColor: theme.colors.surface },
             ]}
-          >
-            <Text variant="headlineSmall" style={styles.modalTitle}>
-              Edit Item
-            </Text>
-
-            <Divider style={styles.modalDivider} />
-
-            <TextInput
-              label="Item Name"
-              value={editForm.name}
-              onChangeText={(text) => setEditForm({ ...editForm, name: text })}
-              style={styles.modalInput}
-              mode="outlined"
-            />
-
-            <TextInput
-              label="Price"
-              value={editForm.price}
-              onChangeText={(text) => setEditForm({ ...editForm, price: text })}
-              style={styles.modalInput}
-              mode="outlined"
-              keyboardType="decimal-pad"
-              left={<TextInput.Affix text="$" />}
-            />
-
-            <TextInput
-              label="Quantity"
-              value={editForm.quantity}
-              onChangeText={(text) =>
-                setEditForm({ ...editForm, quantity: text })
-              }
-              style={styles.modalInput}
-              mode="outlined"
-              keyboardType="number-pad"
-            />
-
-            <View style={styles.modalActions}>
-              <Button
-                mode="outlined"
-                onPress={handleCancelEdit}
-                style={styles.modalButton}
-              >
-                Cancel
-              </Button>
-              <Button
-                mode="contained"
-                onPress={handleSaveEdit}
-                style={styles.modalButton}
-              >
-                Save
-              </Button>
-            </View>
-          </Modal>
-        </Portal>
-
-        {/* Loading Overlay */}
-        {isProcessing && (
-          <View style={styles.loadingOverlay}>
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator
-                size="large"
-                color={theme.colors.primary}
-                style={styles.loadingSpinner}
-              />
-              <Text variant="titleMedium" style={styles.loadingText}>
-                Processing Receipt...
-              </Text>
-              <Text variant="bodyMedium" style={styles.loadingSubtext}>
-                Extracting items and prices
-              </Text>
-            </View>
-          </View>
-        )}
+            onPress={handlePickFromGallery}
+            disabled={isProcessing}
+          />
+          <FAB
+            icon="camera"
+            size="large"
+            style={[
+              styles.captureButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
+            onPress={handleTakePhoto}
+            loading={isProcessing}
+            disabled={isProcessing}
+          />
+        </View>
       </View>
+
+      {/* Edit Item Modal */}
+      <Portal>
+        <Modal
+          visible={showEditModal}
+          onDismiss={handleCancelEdit}
+          contentContainerStyle={[
+            styles.modalContainer,
+            { backgroundColor: theme.colors.surface },
+          ]}
+        >
+          <Text variant="headlineSmall" style={styles.modalTitle}>
+            Edit Item
+          </Text>
+
+          <Divider style={styles.modalDivider} />
+
+          <TextInput
+            label="Item Name"
+            value={editForm.name}
+            onChangeText={(text) => setEditForm({ ...editForm, name: text })}
+            style={styles.modalInput}
+            mode="outlined"
+          />
+
+          <TextInput
+            label="Price"
+            value={editForm.price}
+            onChangeText={(text) => setEditForm({ ...editForm, price: text })}
+            style={styles.modalInput}
+            mode="outlined"
+            keyboardType="decimal-pad"
+            left={<TextInput.Affix text="$" />}
+          />
+
+          <TextInput
+            label="Quantity"
+            value={editForm.quantity}
+            onChangeText={(text) =>
+              setEditForm({ ...editForm, quantity: text })
+            }
+            style={styles.modalInput}
+            mode="outlined"
+            keyboardType="number-pad"
+          />
+
+          <View style={styles.modalActions}>
+            <Button
+              mode="outlined"
+              onPress={handleCancelEdit}
+              style={styles.modalButton}
+            >
+              Cancel
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleSaveEdit}
+              style={styles.modalButton}
+            >
+              Save
+            </Button>
+          </View>
+        </Modal>
+      </Portal>
+
+      {/* Loading Overlay */}
+      {isProcessing && (
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={theme.colors.primary}
+              style={styles.loadingSpinner}
+            />
+            <Text variant="titleMedium" style={styles.loadingText}>
+              Processing Receipt...
+            </Text>
+            <Text variant="bodyMedium" style={styles.loadingSubtext}>
+              Extracting items and prices
+            </Text>
+          </View>
+        </View>
+      )}
     </ImageBackground>
   );
 }
@@ -405,7 +404,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
     padding: 20,
   },
@@ -434,22 +433,41 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
   },
-  cameraContainer: {
+  cameraWindow: {
+    width: 320,
+    height: 460,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginBottom: 20,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    backgroundColor: "#000",
+    position: "relative",
+  },
+  cameraView: {
     flex: 1,
+    width: "100%",
+    height: "100%",
   },
   overlay: {
-    flex: 1,
-    justifyContent: "space-between",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    paddingVertical: 60,
+    backgroundColor: "rgba(0,0,0,0.1)",
   },
   receiptFrame: {
-    width: 280,
-    height: 400,
+    width: 220,
+    height: 300,
     position: "relative",
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.8)",
+    borderColor: "rgba(255,255,255,0.9)",
     borderStyle: "dashed",
     borderRadius: 8,
     justifyContent: "center",
@@ -494,6 +512,7 @@ const styles = StyleSheet.create({
   instructionContainer: {
     alignItems: "center",
     paddingHorizontal: 20,
+    marginBottom: 20,
   },
   instructionText: {
     color: "white",
@@ -501,11 +520,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontWeight: "600",
     fontFamily: "Fredoka_500Medium",
+    textShadowColor: "rgba(0,0,0,0.8)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   subInstructionText: {
-    color: "rgba(255,255,255,0.8)",
+    color: "rgba(255,255,255,0.9)",
     textAlign: "center",
     fontFamily: "Lato_400Regular",
+    textShadowColor: "rgba(0,0,0,0.8)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   actionButtons: {
     flexDirection: "row",

@@ -115,7 +115,8 @@ export default {
       fontSize: 12,
       fontWeight: "400" as const,
       lineHeight: 16,
-    },    labelLarge: {
+    },
+    labelLarge: {
       fontFamily: "Fredoka_600SemiBold",
       fontSize: 14,
       fontWeight: "600" as const,
