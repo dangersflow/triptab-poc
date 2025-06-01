@@ -7,9 +7,10 @@ import {
 } from "@/services/receiptScanner";
 import { ReceiptItem, useStore } from "@/store/useStore";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -29,7 +30,21 @@ export default function Scan() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentImageUri, setCurrentImageUri] = useState<string>("");
   const [scanResult, setScanResult] = useState<ReceiptScanResult | null>(null);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const cameraRef = useRef<CameraView>(null);
+
+  // Manage camera lifecycle during tab navigation
+  useFocusEffect(
+    useCallback(() => {
+      // Tab is focused - ensure camera is ready
+      setIsCameraReady(true);
+
+      return () => {
+        // Tab is losing focus - reset camera state
+        setIsCameraReady(false);
+      };
+    }, [])
+  );
 
   const handleRequestPermission = async () => {
     setPermissionRequested(true);
@@ -202,7 +217,29 @@ export default function Scan() {
       <ThemedAppbar />
       <View style={[styles.container, { backgroundColor: "transparent" }]}>
         <View style={styles.cameraWindow}>
-          <CameraView ref={cameraRef} style={styles.cameraView} facing="back" />
+          {isCameraReady ? (
+            <CameraView
+              ref={cameraRef}
+              style={styles.cameraView}
+              facing="back"
+            />
+          ) : (
+            <View
+              style={[
+                styles.cameraView,
+                {
+                  backgroundColor: "#000",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <ActivityIndicator size="large" color="white" />
+              <Text style={{ color: "white", marginTop: 16 }}>
+                Initializing Camera...
+              </Text>
+            </View>
+          )}
           <View style={styles.overlay}>
             <View style={styles.receiptFrame}>
               <View style={styles.frameCorner} />
@@ -245,7 +282,7 @@ export default function Scan() {
             loading={isProcessing}
             disabled={isProcessing}
           />
-        </View>{" "}
+        </View>
       </View>
 
       {/* Loading Overlay */}
