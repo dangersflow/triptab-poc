@@ -10,6 +10,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -130,22 +131,24 @@ export default function Scan() {
   };
 
   const handleConfirmReceipt = (items: ReceiptItem[]) => {
-    addReceiptItems(items);
+    // First navigate to home tab
+    router.push("/");
+
+    // Then add items to store after a short delay to see the animation
+    setTimeout(() => {
+      addReceiptItems(items);
+    }, 500);
+
     setShowConfirmation(false);
     setScanResult(null);
     setCurrentImageUri("");
-
-    Alert.alert(
-      "Receipt Added!",
-      `${items.length} items have been added to your trip.`,
-      [{ text: "OK" }]
-    );
   };
   const handleCancelConfirmation = () => {
     setShowConfirmation(false);
     setScanResult(null);
     setCurrentImageUri("");
   };
+
   // Show confirmation screen if we have scan results
   if (showConfirmation && scanResult && currentImageUri) {
     return (
