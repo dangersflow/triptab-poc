@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 28,
     fontFamily: "Fredoka_700Bold",
+    textAlign: "center",
   },
   digits: {
     fontSize: 48,

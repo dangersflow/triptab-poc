@@ -170,7 +170,10 @@ export default function ReceiptConfirmation({
                       {item.name}
                     </Text>
                     <View style={styles.itemDetails}>
-                      <Chip style={styles.quantityChip}>
+                      <Chip
+                        style={styles.quantityChip}
+                        textStyle={{ fontSize: 14 }}
+                      >
                         Qty: {item.quantity || 1}
                       </Chip>
                       <Text variant="titleMedium" style={styles.itemPrice}>
@@ -381,6 +384,7 @@ const styles = StyleSheet.create({
     fontFamily: "Fredoka_500Medium",
   },
   itemRow: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 8,
@@ -398,9 +402,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  quantityChip: {
-    height: 24,
-  },
+  quantityChip: {},
   itemPrice: {
     fontWeight: "600",
     fontFamily: "Fredoka_500Medium",
